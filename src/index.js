@@ -20,19 +20,21 @@ app.use(express.urlencoded({extended:true}))
 app.use(express.json());
 
 app.get('/peers',async (req,res)=>{
-    let peers = await Peer.find({},{_id:0});
-
+    let peers = await Peer.find({},{_id:0,__v:0});
+    let urls = peers.map(peer=>{
+        return peer["url"]
+    })
     res.status(200).send({
-        peers
+        peers:urls
     })
 })
 
 app.post('/peers',async(req,res)=>{
-    let url = req.url
-
+    let url = req.body.url
+    console.log(url)
     try{
     await new Peer({
-        url:peer
+        url:url
     }).save()
 
     res.status(201).send({
@@ -48,7 +50,7 @@ app.post('/peers',async(req,res)=>{
 })
 
 app.delete('/peers',async(req,res)=>{
-    let url = req.url
+    let url = req.body.url
 
     try{
         await Peer.findOneAndDelete({url:url});
